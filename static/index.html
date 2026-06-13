@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Anonimiza · imágenes clínicas</title>
+
+  <!-- Favicon: el objetivo -->
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('images', filename='favicon.svg') }}" />
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('images', filename='favicon-32.png') }}" />
+  <link rel="icon" href="{{ url_for('images', filename='favicon.ico') }}" sizes="any" />
+  <link rel="apple-touch-icon" href="{{ url_for('images', filename='apple-touch-icon.png') }}" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body>
+  <!-- Atmósfera de fondo -->
+  <div class="aura" aria-hidden="true"></div>
+
+  <header class="barra">
+    <div class="barra__derecha">
+      <!-- Selector de idioma -->
+      <div class="idiomas" role="group" aria-label="Idioma / Language">
+        <button class="idiomas__btn" type="button" data-lang="es">ES</button>
+        <button class="idiomas__btn" type="button" data-lang="en">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="escena">
+    <p class="eyebrow" data-i18n="eyebrow">Anonimización clínica</p>
+    <h1 class="titular" data-i18n="titular">Que se vea el caso, no el paciente.</h1>
+    <p class="entrada" data-i18n="entrada">
+      Sube una imagen clínica y la IA elimina rostros, identificadores y metadatos.
+      La descargas lista para compartir o publicar.
+    </p>
+
+    <!-- SEÑA DE IDENTIDAD: el objetivo / diafragma -->
+    <div
+      class="objetivo"
+      id="objetivo"
+      role="button"
+      tabindex="0"
+      aria-label="Subir una imagen clínica"
+    >
+      <div class="objetivo__halo" aria-hidden="true"></div>
+
+      <svg class="objetivo__anillo" viewBox="0 0 200 200" aria-hidden="true">
+        <circle cx="100" cy="100" r="94" />
+      </svg>
+
+      <!-- Iris / diafragma -->
+      <svg class="iris" viewBox="0 0 200 200" aria-hidden="true">
+        <defs>
+          <linearGradient id="gradIris" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#FFC97A" />
+            <stop offset="50%" stop-color="#FF8FB1" />
+            <stop offset="100%" stop-color="#9B8CFF" />
+          </linearGradient>
+        </defs>
+        <g class="iris__hojas">
+          <path
+            class="iris__cuerpo"
+            fill-rule="evenodd"
+            d="M18,100 A82,82 0 1 1 182,100 A82,82 0 1 1 18,100 Z
+               M122.5,113 L100,126 L77.5,113 L77.5,87 L100,74 L122.5,87 Z"
+          />
+          <g class="iris__costuras">
+            <line x1="122.5" y1="113" x2="143.4" y2="169.5" />
+            <line x1="100"   y1="126" x2="61.5"  y2="172.4" />
+            <line x1="77.5"  y1="113" x2="18.1"  y2="102.9" />
+            <line x1="77.5"  y1="87"  x2="56.6"  y2="30.5" />
+            <line x1="100"   y1="74"  x2="138.5" y2="27.6" />
+            <line x1="122.5" y1="87"  x2="182"   y2="97.1" />
+          </g>
+        </g>
+      </svg>
+
+      <!-- La imagen subida aparece dentro del objetivo -->
+      <div class="objetivo__vista" id="vista" aria-hidden="true">
+        <img id="previa" alt="" />
+        <span class="objetivo__enfoque" aria-hidden="true"></span>
+      </div>
+
+      <input type="file" id="archivo" accept="image/*" hidden />
+    </div>
+
+    <!-- Texto guía -->
+    <div class="guia" id="guia">
+      <span class="guia__principal" id="guiaPrincipal">Suelta la imagen clínica aquí</span>
+      <span class="guia__secundario" id="guiaSecundario">o pulsa para buscarla</span>
+    </div>
+
+    <!-- Detalle del archivo + acciones (solo con imagen) -->
+    <div class="ficha" id="ficha" hidden>
+      <div class="ficha__info">
+        <span class="ficha__nombre" id="fichaNombre">imagen.png</span>
+        <span class="ficha__peso" id="fichaPeso">0 KB</span>
+      </div>
+      <div class="ficha__acciones">
+        <button class="boton boton--fantasma" id="cambiar" type="button" data-i18n="cambiar">Cambiar imagen</button>
+        <button class="boton boton--solido" id="enfocar" type="button" data-i18n="enfocar">Anonimizar</button>
+      </div>
+    </div>
+
+    <!-- Pie de zona vacía -->
+    <ul class="metadatos" id="metadatos">
+      <li><span class="metadatos__clave" data-i18n="metaFormatos">Formatos</span> PNG · JPG · WEBP</li>
+      <li><span class="metadatos__clave" data-i18n="metaLimite">Límite</span> 10 MB</li>
+      <li><span class="metadatos__clave" data-i18n="metaPrivacidad">Privacidad</span> <span data-i18n="metaPrivacidadValor">se procesa en tu equipo</span></li>
+    </ul>
+  </main>
+
+  <!-- Notificación -->
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+</body>
+</html>

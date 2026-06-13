@@ -1,0 +1,30 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Objetivo">
+  <defs>
+    <linearGradient id="favIris" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFC97A" />
+      <stop offset="50%" stop-color="#FF8FB1" />
+      <stop offset="100%" stop-color="#9B8CFF" />
+    </linearGradient>
+  </defs>
+
+  <!-- Carcasa del objetivo -->
+  <circle cx="50" cy="50" r="49" fill="#16121e" />
+
+  <!-- Iris con hueco hexagonal -->
+  <path
+    fill="url(#favIris)"
+    fill-rule="evenodd"
+    d="M8,50 A42,42 0 1 1 92,50 A42,42 0 1 1 8,50 Z
+       M61.26,56.5 L50,63 L38.74,56.5 L38.74,43.5 L50,37 L61.26,43.5 Z"
+  />
+
+  <!-- Costuras de las hojas -->
+  <g stroke="#16121e" stroke-width="2.4" stroke-linecap="round">
+    <line x1="61.26" y1="56.5" x2="72.26" y2="85.62" />
+    <line x1="50"    y1="63"   x2="30.28" y2="87.08" />
+    <line x1="38.74" y1="56.5" x2="8.03"  y2="51.47" />
+    <line x1="38.74" y1="43.5" x2="27.74" y2="14.38" />
+    <line x1="50"    y1="37"   x2="69.72" y2="12.92" />
+    <line x1="61.26" y1="43.5" x2="91.97" y2="48.53" />
+  </g>
+</svg>
