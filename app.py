@@ -19,7 +19,7 @@ from flask import Flask, render_template, request, jsonify, send_from_directory
 # ---------------------------------------------------------------------------
 BASE_DIR = path.dirname(path.abspath(__file__))
 UPLOAD_DIR = path.join(BASE_DIR, "uploads")
-ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp", "gif", "avif"}
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp"}
 MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10 MB
 
 makedirs(UPLOAD_DIR, exist_ok=True)
