@@ -18,7 +18,6 @@ dist/
 # ── Modelos y pesos (pesados, no van a Git) ─────────────────────
 *.pth
 *.onnx
-runs/
  
 # ── Subidas y salidas generadas en runtime ──────────────────────
 uploads/
