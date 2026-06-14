@@ -1,1 +1,14 @@
+# ── App web (necesario para arrancar y anonimizar) ──────────────
 Flask>=3.0
+numpy
+opencv-python            # módulo cv2: recortes, máscaras e inpaint del borrado
+ 
+# ── Motor OCR ───────────────────────────────────────────────────
+ultralytics              # detección de cajas de texto (YOLO)
+paddleocr                # reconocimiento de texto (PP-OCRv5)
+paddlepaddle             # backend de paddleocr
+ 
+# ── Solo entrenamiento (ia/training.py) ─────────────────────────
+# ultralytics ya instala torch y pyyaml; se listan por claridad.
+torch
+pyyaml

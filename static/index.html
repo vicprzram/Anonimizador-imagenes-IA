@@ -89,6 +89,25 @@
         <span class="objetivo__enfoque" aria-hidden="true"></span>
       </div>
 
+      <!-- Obturador para la animación de carga (diafragma cerrándose/abriendo) -->
+      <svg class="obturador" id="obturador" viewBox="0 0 200 200" aria-hidden="true">
+        <defs>
+          <linearGradient id="gradObtur" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#FFC97A" />
+            <stop offset="50%" stop-color="#FF8FB1" />
+            <stop offset="100%" stop-color="#9B8CFF" />
+          </linearGradient>
+        </defs>
+        <g class="obturador__hojas">
+          <path class="obturador__hoja" d="M100,100 L100,8 A92,92 0 0,1 179.7,54 Z" />
+          <path class="obturador__hoja" d="M100,100 L179.7,54 A92,92 0 0,1 179.7,146 Z" />
+          <path class="obturador__hoja" d="M100,100 L179.7,146 A92,92 0 0,1 100,192 Z" />
+          <path class="obturador__hoja" d="M100,100 L100,192 A92,92 0 0,1 20.3,146 Z" />
+          <path class="obturador__hoja" d="M100,100 L20.3,146 A92,92 0 0,1 20.3,54 Z" />
+          <path class="obturador__hoja" d="M100,100 L20.3,54 A92,92 0 0,1 100,8 Z" />
+        </g>
+      </svg>
+
       <input type="file" id="archivo" accept="image/*" hidden />
     </div>
 
@@ -109,6 +128,38 @@
         <button class="boton boton--solido" id="enfocar" type="button" data-i18n="enfocar">Anonimizar</button>
       </div>
     </div>
+
+    <!-- Resultado del anonimizado (comparación + texto detectado) -->
+    <section class="resultado" id="resultado" hidden aria-live="polite">
+      <div class="resultado__lienzo">
+        <figure class="resultado__panel">
+          <figcaption class="resultado__rotulo" data-i18n="resAntes">Original</figcaption>
+          <img class="resultado__img" id="resImgAntes" alt="" />
+          <!-- Cajas detectadas: se dibujan sobre la imagen original -->
+          <div class="resultado__cajas" id="cajas" aria-hidden="true"></div>
+        </figure>
+        <figure class="resultado__panel">
+          <figcaption class="resultado__rotulo resultado__rotulo--ok" data-i18n="resDespues">Anonimizada</figcaption>
+          <img class="resultado__img" id="resImgDespues" alt="" />
+        </figure>
+      </div>
+
+      <div class="resultado__datos">
+        <header class="resultado__cab">
+          <span class="resultado__titulo" data-i18n="resTexto">Texto detectado y eliminado</span>
+          <span class="resultado__contador" id="resContador">0</span>
+        </header>
+        <ul class="resultado__lista" id="resLista"></ul>
+        <p class="resultado__vacio" id="resVacio" data-i18n="resSinTexto" hidden>
+          No se detectó texto identificable.
+        </p>
+      </div>
+
+      <div class="resultado__acciones">
+        <a class="boton boton--solido" id="resDescargar" download="anonimizada.png" data-i18n="resDescargar">Descargar imagen</a>
+        <button class="boton boton--fantasma" id="resOtra" type="button" data-i18n="resOtra">Anonimizar otra</button>
+      </div>
+    </section>
 
     <!-- Pie de zona vacía -->
     <ul class="metadatos" id="metadatos">

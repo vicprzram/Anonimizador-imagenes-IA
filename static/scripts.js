@@ -37,6 +37,15 @@
       toastGuardadaSub: "Sin datos del paciente, lista para compartir.",
       toastError: "No se pudo procesar",
       toastErrorSub: "Revisa que el servidor esté en marcha.",
+      toastEnviada: "Enviada a anonimizar",
+      toastEnviadaSub: "La IA está localizando y borrando los datos…",
+      // resultado
+      resAntes: "Original",
+      resDespues: "Anonimizada",
+      resTexto: "Texto detectado y eliminado",
+      resSinTexto: "No se detectó texto identificable.",
+      resDescargar: "Descargar imagen",
+      resOtra: "Anonimizar otra",
     },
     en: {
       docTitle: "Clinical anonymizer",
@@ -65,6 +74,15 @@
       toastGuardadaSub: "No patient data, ready to share.",
       toastError: "Couldn't process",
       toastErrorSub: "Check that the server is running.",
+      toastEnviada: "Sent for anonymizing",
+      toastEnviadaSub: "The AI is locating and removing the data…",
+      // resultado
+      resAntes: "Original",
+      resDespues: "Anonymized",
+      resTexto: "Detected and removed text",
+      resSinTexto: "No identifiable text was detected.",
+      resDescargar: "Download image",
+      resOtra: "Anonymize another",
     },
   };
 
@@ -85,6 +103,17 @@
   const guiaSecundario = document.getElementById("guiaSecundario");
   const toast       = document.getElementById("toast");
   const botonesIdioma = document.querySelectorAll(".idiomas__btn");
+
+  // Resultado
+  const resultado     = document.getElementById("resultado");
+  const resImgAntes   = document.getElementById("resImgAntes");
+  const resImgDespues = document.getElementById("resImgDespues");
+  const resLista      = document.getElementById("resLista");
+  const resVacio      = document.getElementById("resVacio");
+  const resContador   = document.getElementById("resContador");
+  const resDescargar  = document.getElementById("resDescargar");
+  const resOtra       = document.getElementById("resOtra");
+  const capaCajas     = document.getElementById("cajas");
 
   // -- Estado de la aplicación -----------------------------------------
   let idioma = localStorage.getItem("idioma") || (navigator.language || "es").slice(0, 2);
@@ -187,23 +216,89 @@
     lector.readAsDataURL(archivo);
   }
 
-  // -- Guardar en el motor Python (al pulsar Enfocar) ------------------
-  async function guardarEnServidor(archivo) {
+  // -- Procesar en el motor Python (al pulsar Anonimizar) --------------
+  async function anonimizarEnServidor(archivo) {
     const datos = new FormData();
     datos.append("imagen", archivo);
-    const r = await fetch("/upload", { method: "POST", body: datos });
+    const r = await fetch("/anonimizar", { method: "POST", body: datos });
     const res = await r.json();
     if (!res || !res.ok) throw new Error((res && res.error) || "error");
     return res;
   }
 
+  // -- Dibujar las cajas detectadas sobre la imagen del objetivo -------
+  function dibujarCajas(cajas) {
+    capaCajas.innerHTML = "";
+    if (!Array.isArray(cajas)) return;
+    cajas.forEach((c, i) => {
+      const el = document.createElement("span");
+      el.className = "caja-det";
+      // posición en % (las coords vienen normalizadas 0..1)
+      el.style.left = `${c.x * 100}%`;
+      el.style.top = `${c.y * 100}%`;
+      el.style.width = `${c.w * 100}%`;
+      el.style.height = `${c.h * 100}%`;
+      // aparición escalonada
+      el.style.animationDelay = `${i * 0.08}s`;
+      capaCajas.appendChild(el);
+    });
+  }
+
+  // -- Pintar el resultado (comparación + cajas + texto) ---------------
+  function mostrarResultado(res) {
+    // imágenes antes / después
+    resImgAntes.src = previa.src || "";
+    resImgDespues.src = res.imagen;
+
+    // la lente y la ficha desaparecen; manda el bloque de comparación
+    objetivo.classList.remove("is-cargando");
+    document.body.classList.add("tiene-resultado");
+
+    // dibujar las cajas sobre la imagen Original (aparecen y se desvanecen)
+    dibujarCajas(res.cajas || []);
+
+    // enlace de descarga (nombre derivado del original)
+    resDescargar.href = res.imagen;
+    const base = (res.original || "imagen").replace(/\.[^.]+$/, "");
+    resDescargar.download = `${base}_anonimizada.png`;
+
+    // lista de textos detectados
+    resLista.innerHTML = "";
+    const lecturas = res.lecturas || [];
+    if (lecturas.length === 0) {
+      resVacio.hidden = false;
+      resLista.hidden = true;
+    } else {
+      resVacio.hidden = true;
+      resLista.hidden = false;
+      lecturas.forEach((l) => {
+        const li = document.createElement("li");
+        li.textContent = l.texto;
+        if (typeof l.score === "number") {
+          const s = document.createElement("span");
+          s.className = "puntuacion";
+          s.textContent = `${Math.round(l.score * 100)}%`;
+          li.appendChild(s);
+        }
+        resLista.appendChild(li);
+      });
+    }
+    resContador.textContent = lecturas.length;
+
+    resultado.hidden = false;
+    resultado.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   // -- Reiniciar --------------------------------------------------------
   function reiniciar() {
-    objetivo.classList.remove("has-imagen", "is-enfocando");
+    document.body.classList.remove("tiene-resultado");
+    objetivo.classList.remove("has-imagen", "is-enfocando", "is-cargando");
     vista.setAttribute("aria-hidden", "true");
     previa.removeAttribute("src");
+    if (capaCajas) capaCajas.innerHTML = "";
     ficha.hidden = true;
     metadatos.hidden = false;
+    if (resultado) resultado.hidden = true;
     inputFile.value = "";
     archivoActual = null;
     guardado = false;
@@ -260,24 +355,29 @@
 
   // -- Botones ----------------------------------------------------------
   btnCambiar.addEventListener("click", reiniciar);
+  if (resOtra) resOtra.addEventListener("click", reiniciar);
 
   btnEnfocar.addEventListener("click", async () => {
     if (!archivoActual) return;
 
-    // Animación de barrido de enfoque
+    // Aviso inmediato + animación de carga (diafragma cerrándose/abriendo)
+    mostrarToast("toastEnviada", "toastEnviadaSub", "ok");
+    document.body.classList.remove("tiene-resultado");
     objetivo.classList.remove("is-enfocando");
-    void objetivo.offsetWidth;
-    objetivo.classList.add("is-enfocando");
+    objetivo.classList.add("is-cargando");
+    capaCajas.innerHTML = "";
 
     btnEnfocar.disabled = true;
     ponerEstado("estGuardando");
 
     try {
-      await guardarEnServidor(archivoActual);
+      const res = await anonimizarEnServidor(archivoActual);
       guardado = true;
       ponerEstado("estGuardada", "ok");
       mostrarToast("toastGuardada", "toastGuardadaSub", "ok");
+      mostrarResultado(res);
     } catch (err) {
+      objetivo.classList.remove("is-cargando");
       ponerEstado("estErrorGuardar", "error");
       mostrarToast("toastError", "toastErrorSub", "error");
     } finally {

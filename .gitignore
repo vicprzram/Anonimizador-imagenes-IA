@@ -1,0 +1,37 @@
+# ── Entorno virtual ─────────────────────────────────────────────
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+ 
+# ── Caché de Python ─────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.Python
+build/
+dist/
+ 
+# ── Modelos y pesos (pesados, no van a Git) ─────────────────────
+*.pt
+*.pth
+*.onnx
+runs/
+ 
+# ── Subidas y salidas generadas en runtime ──────────────────────
+uploads/
+ia/deleted/
+debug_caja_*.png
+ 
+# ── Notebooks / herramientas ────────────────────────────────────
+.ipynb_checkpoints/
+ 
+# ── IDE y sistema operativo ─────────────────────────────────────
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+ 
