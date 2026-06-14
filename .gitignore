@@ -16,7 +16,6 @@ build/
 dist/
  
 # ── Modelos y pesos (pesados, no van a Git) ─────────────────────
-*.pt
 *.pth
 *.onnx
 runs/
